@@ -3,40 +3,41 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="WeChat2Telecom"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat">
 
-        <!-- Xposed Module Metadata -->
+        <!-- LSPosed/Xposed 模块元数据 -->
         <meta-data
             android:name="xposedmodule"
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Refactored wechat2telecom as LSPosed hybrid module." />
+            android:value="将微信语音来电集成至系统原生通话界面 (Telecom 框架支持)" />
         <meta-data
             android:name="xposedminversion"
             android:value="82" />
 
-        <!-- IPC Bridge: Custom Service for Binder communication -->
+        <!-- 核心桥接服务 -->
+        <!-- 必须声明 BIND_TELECOM_CONNECTION_SERVICE 权限以供系统调用 -->
         <service
             android:name=".ipc.TelecomBridgeService"
             android:enabled="true"
             android:exported="true"
-            android:permission="com.example.wechat2telecom.PERMISSION_WECHAT_BRIDGE">
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE">
             <intent-filter>
+                <!-- 系统连接服务 Action -->
+                <action android:name="android.telecom.ConnectionService" />
+                <!-- 自定义 Action 供 Xposed 进程绑定 -->
                 <action android:name="com.example.wechat2telecom.ACTION_BIND_BRIDGE" />
             </intent-filter>
         </service>
 
     </application>
 
-    <!-- Custom permission for IPC Bridge security -->
-    <permission
-        android:name="com.example.wechat2telecom.PERMISSION_WECHAT_BRIDGE"
-        android:protectionLevel="signature" />
-    <uses-permission android:name="com.example.wechat2telecom.PERMISSION_WECHAT_BRIDGE" />
+    <!-- 必要的权限声明 -->
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
 </manifest>
